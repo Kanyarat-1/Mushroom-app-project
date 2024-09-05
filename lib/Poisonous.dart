@@ -12,33 +12,38 @@ class PoisonousPage extends StatefulWidget {
 
 class _PoisonousPageState extends State<PoisonousPage> {
   List userdata = [];
-  List filteredData = [];
+  List<dynamic> filteredData = [];
   String searchText = '';
   bool isLoading = true;
 
   Future<void> getrecord() async {
-    String uri = "https://mushroomroom.000webhostapp.com/Test/signup/view_poisonous.php";
     try {
-      var response = await http.get(Uri.parse(uri));
+      var response = await http.get(Uri.parse("http://192.168.173.28/signup/poisonous_list.php"));
+      print('Raw response body: ${response.body}');
+      
       if (response.statusCode == 200) {
+        // ตรวจสอบว่าเป็น JSON หรือไม่
+        List<dynamic> jsonResponse = json.decode(response.body);
         setState(() {
-          userdata = jsonDecode(response.body);
-          filteredData = List.from(userdata);
-          isLoading = false;
+          userdata = jsonResponse; // กำหนดค่า userdata ให้เป็น jsonResponse 
+          filteredData = userdata; 
+          isLoading = false; 
         });
+        print(userdata);
       } else {
-        print('Failed to load data. Status code: ${response.statusCode}');
         setState(() {
           isLoading = false;
         });
+        print('Failed to load data');
       }
     } catch (e) {
-      print('Error: $e');
       setState(() {
         isLoading = false;
       });
+      print('Error: $e');
     }
   }
+
 
   @override
   void initState() {
@@ -56,7 +61,7 @@ class _PoisonousPageState extends State<PoisonousPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Mushroom Poisonous")),
+      appBar: AppBar(title: Text("เห็ดมีพิษ")),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
@@ -67,15 +72,13 @@ class _PoisonousPageState extends State<PoisonousPage> {
                     decoration: InputDecoration(
                       hintText: 'Search',
                       contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: () {
-                          // Action when search button is pressed
-                        },
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      suffixIcon: Icon(Icons.search),
                     ),
                     onChanged: (value) {
-                      search(value); // Call search function every time TextField changes
+                      search(value); // เรียกใช้ฟังก์ชันค้นหาทุกครั้งที่มีการกรอกข้อมูล
                     },
                   ),
                 ),
@@ -83,52 +86,40 @@ class _PoisonousPageState extends State<PoisonousPage> {
                   child: ListView.builder(
                     itemCount: filteredData.length,
                     itemBuilder: (context, index) {
-                      return Card(
-                        margin: EdgeInsets.all(10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey), // Set border color
-                            borderRadius: BorderRadius.circular(10), // Set rounded corners for Card
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10), // Set rounded corners for image
-                            child: ListTile(
-                              contentPadding: EdgeInsets.all(10), // Set padding for ListTile
-                              title: Text(filteredData[index]["mush_name"]),
-                              leading: SizedBox(
-                                width: 80, // Set width of the image
-                                height: 80, // Set height of the image
-                                child: Image.network(
-                                  filteredData[index]["image"],
-                                  fit: BoxFit.cover, // Fit image within the bounds
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(Icons.error);
-                                  },
+                      if (index >= filteredData.length) {
+                        return Container();
+                      }
+
+                      var newsItem = filteredData[index];
+                      print('News item: $newsItem');
+
+                      return Container(
+                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          title: Text(newsItem['mush_name'] ?? 'No name'),
+                          onTap: () {                           
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DataMushroomPage(
+                                  mushroomData: newsItem,
                                 ),
                               ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DataMushroomPage(
-                                      mushroomData: filteredData[index],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                            );
+                            }
                         ),
                       );
                     },

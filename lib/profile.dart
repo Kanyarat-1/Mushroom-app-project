@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:flutter_application_1/login.dart';
+import 'package:flutter_application_1/Changepassword.dart';
 
 const double kSpacingUnit = 10;
 const Color kDarkPrimaryColor = Color.fromARGB(255, 255, 255, 255);
@@ -25,9 +26,8 @@ const TextStyle kButtonTextStyle = TextStyle(
 );
 
 class ProfilePage extends StatefulWidget {
-  final String username;
 
-  const ProfilePage({Key? key, required this.username}) : super(key: key);
+  const ProfilePage({Key? key,}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -39,6 +39,14 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => Login(), // Your login page widget
+      ),
+    );
+  }
+
+  void _changePassword() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ChangePasswordPage(), // Your login page widget
       ),
     );
   }
@@ -80,19 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         SizedBox(height: kSpacingUnit.w * 2),
-        Text(widget.username, style: kTitleTextStyle), // Display the username
+        Text('Geust', style: kTitleTextStyle),
         SizedBox(height: kSpacingUnit.w * 0.5),
-        Container(
-          height: kSpacingUnit.w * 5,
-          width: kSpacingUnit.w * 20,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
-            color: Color.fromARGB(255, 218, 160, 241),
-          ),
-          child: Center(
-            child: Text('Change username', style: kButtonTextStyle,),
-            ),
-        )
       ],
     );
     return Scaffold(
@@ -121,6 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: LineAwesomeIcons.pen_fancy,
                     text: 'Change Password',
                     hasNavigation: true,
+                    onTap: _changePassword,
                   ),
                   SizedBox(height: kSpacingUnit.w * 0), // Add space between buttons
                   ProfileListItem(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Navbar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'dart:convert'; // Ensure this is the correct import for your home page
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -12,59 +14,48 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   final formKey = GlobalKey<FormState>();
 
-  TextEditingController name = TextEditingController();
-  TextEditingController email = TextEditingController();
+  TextEditingController username = TextEditingController();
+  TextEditingController Email = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  Future signUp(BuildContext context) async {
-  String url = "https://mushroomroom.000webhostapp.com/Test/register.php";
-  final response = await http.post(Uri.parse(url), body: {
-    'username': name.text,
-    'email': email.text,
-    'password': password.text,
-  });
-  var data = json.decode(response.body);
-  print(data); // Debug: print the response to see what the server returns
-  if (data == "Error") {
-    // Show an alert dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Registration Failed"),
-          content: Text("An error occurred during registration. Please try again."),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  } else {
-    // Show success message
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Registration Success"),
-          content: Text("You have been successfully registered."),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.pushNamed(context, 'home');
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future register(BuildContext context) async {
+    var url = "http://192.168.173.28/signup/register.php"; //กำหนด Url ของ server
+    var response = await http.post(Uri.parse(url), body: {
+      //ใช้ http.post เพื่อส่งข้อมูล
+      "username": username.text,
+      "Email": Email.text,
+      "password": password.text,
+    });
+
+
+    //แปลงข้อมูลที่ตอบกลับจากเซิร์ฟเวอร์ให้เป็นรูปแบบที่ Dart อ่านได้ แล้วตรวจสอบ error
+    var data = json.decode(response.body);
+    if (data == "Error") {
+      Fluttertoast.showToast(
+        msg: "Register Failed",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Register Success",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Navbar(username: '', user_id: '',)), // Navigate to Home page
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +91,14 @@ class _RegisterState extends State<Register> {
                   SizedBox(
                     width: 350,
                     child: TextFormField(
-                      controller: name,
+                      controller: username,
                       obscureText: false,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Your name',
                       ),
+                      //val รับค่า validator ที่กรอกใน TextFormField
+                      //val!.isEmpty ตรวจค่าว่าง
                       validator: (val) {
                         if (val!.isEmpty) {
                           return 'กรุณากรอกข้อมูล';
@@ -120,7 +113,7 @@ class _RegisterState extends State<Register> {
                   SizedBox(
                     width: 350,
                     child: TextFormField(
-                      controller: email,
+                      controller: Email,
                       obscureText: false,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -183,12 +176,12 @@ class _RegisterState extends State<Register> {
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 228, 191, 245),
+                          backgroundColor: Color.fromARGB(255, 61, 167, 249),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15))),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          signUp(context); // Pass the context here
+                          register(context);
                         }
                       },
                       child: const Text(
@@ -196,6 +189,7 @@ class _RegisterState extends State<Register> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),

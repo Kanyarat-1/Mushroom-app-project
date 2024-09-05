@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/home.dart';
-import 'package:flutter_application_1/scan.dart';
-import 'package:flutter_application_1/profile.dart';
+import 'package:flutter_application_1/Scan.dart'; // Ensure the import matches the file and class name
+import 'package:flutter_application_1/firstaid.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class Navbar extends StatefulWidget {
   final String username;
+  final String user_id;
 
-  const Navbar({Key? key, required this.username}) : super(key: key);
+  const Navbar({Key? key, required this.username, required this.user_id}) : super(key: key);
 
   @override
   State<Navbar> createState() => _NavbarState();
@@ -20,10 +21,11 @@ class _NavbarState extends State<Navbar> {
   @override
   void initState() {
     super.initState();
+    // Pass the username to pages that require it
     pages = [
-      const Homepage(),
-      const Scanpage(),
-      ProfilePage(username: widget.username),
+      Homepage(username: widget.username, user_id: widget.user_id),  // Pass the username here
+      ScanPage(), // Update the class name here
+      FirstaidPage(),
     ];
   }
 
@@ -35,8 +37,8 @@ class _NavbarState extends State<Navbar> {
         children: pages,
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Color.fromARGB(255, 250, 217, 247),
-        color: Color.fromARGB(255, 218, 160, 241),
+        backgroundColor: const Color.fromARGB(255, 169, 220, 251),
+        color: const Color.fromARGB(255, 133, 198, 255),
         animationDuration: const Duration(milliseconds: 300),
         onTap: (index) {
           setState(() {
@@ -46,7 +48,7 @@ class _NavbarState extends State<Navbar> {
         items: const [
           Icon(Icons.home, color: Colors.white),
           Icon(Icons.center_focus_strong, color: Colors.white),
-          Icon(Icons.person, color: Colors.white),
+          Icon(Icons.local_hospital, color: Colors.white),
         ],
       ),
     );
