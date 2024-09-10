@@ -22,7 +22,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
   }
 
   Future<Map<String, dynamic>> fetchNewsContent(String newsId) async {
-    String uri = "http://192.168.173.28/signup/view_newsdata.php?id=$newsId";
+    String uri = "http://192.168.217.28/signup/view_newsdata.php?id=$newsId";
 
     try {
       var response = await http.get(Uri.parse(uri));

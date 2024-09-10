@@ -13,13 +13,13 @@ import 'accountpage.dart';
 
 class Homepage extends StatefulWidget {
   final String username;
-  final String user_id;
+  final String userId;
 
   const Homepage({
-    super.key, 
+    Key? key, 
     required this.username, 
-    required this.user_id
-  });
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<Homepage> createState() => _Homepage();
@@ -144,7 +144,7 @@ class _Homepage extends State<Homepage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _image != null ? Image.file(_image!) : Container(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     _compareImage != null
                         ? Text(
                             _compareImage!.isNotEmpty
@@ -178,7 +178,7 @@ class _Homepage extends State<Homepage> {
                                 MaterialPageRoute(
                                   builder: (context) => AccountScreen(
                                     username: widget.username,
-                                    user_id: widget.user_id,
+                                    userId: widget.userId,
                                   ),
                                 ),
                               );

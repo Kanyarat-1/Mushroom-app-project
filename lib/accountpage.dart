@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/editusername.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:flutter_application_1/login.dart';
-import 'package:flutter_application_1/Navbar.dart';
 import 'package:flutter_application_1/ChangePassword.dart';
+import 'package:flutter_application_1/editusername.dart';
 import 'package:flutter_application_1/widgets/setting_item.dart';
 
 class AccountScreen extends StatefulWidget {
   final String username;
-  final String user_id;
+  final String userId; // ตรวจสอบว่าใช้ userId ที่นี่
 
-  const AccountScreen({Key? key, required this.username,required this.user_id}) : super(key: key);
+  const AccountScreen({Key? key, required this.username, required this.userId})
+      : super(key: key);
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -85,11 +85,11 @@ class _AccountScreenState extends State<AccountScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          EditAccountScreen(username: widget.username, user_id: '',),
+                      builder: (context) => EditAccountScreen(
+                          username: widget.username, userId: widget.userId),
                     ),
                   );
-                }, 
+                },
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w500,
@@ -105,14 +105,15 @@ class _AccountScreenState extends State<AccountScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChangePasswordPage(),
+                      builder: (context) =>
+                          ChangePasswordPage(userId: widget.userId),
                     ),
                   );
                 },
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w500,
-                ), 
+                ),
               ),
               const SizedBox(height: 20),
               SettingItem(
@@ -120,19 +121,58 @@ class _AccountScreenState extends State<AccountScreen> {
                 icon: Ionicons.log_out,
                 bgColor: Colors.red.shade100,
                 iconColor: Colors.red,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const Login(),
-                    ),
+                onTap: () async {
+                  // Show the confirmation dialog
+                  bool? shouldLogOut = await showDialog<bool>(
+                    context: context,
+                    barrierDismissible:
+                        false, // Prevents dismissing the dialog by tapping outside
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: const Text(
+                          "แน่ใจหรือไม่ว่าคุณต้องการออกจากระบบ?",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w200,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("ยกเลิก",
+                                style: TextStyle(color: Colors.red)),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(false); // User pressed cancel
+                            },
+                          ),
+                          TextButton(
+                            child: const Text("ตกลง",
+                                style: TextStyle(color: Colors.blue)),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(true); // User pressed confirm
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   );
+
+                  // If the user confirmed, navigate to the login page
+                  if (shouldLogOut == true) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Login(),
+                      ),
+                    );
+                  }
                 },
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w500,
-                ), 
-              ),
+                ),
+              )
             ],
           ),
         ),
@@ -140,3 +180,8 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 }
+
+/*
+TODO: change username and password
+1. เปลี่ยน Username และ Password ตามพารามิเตอร์ที่ login
+*/

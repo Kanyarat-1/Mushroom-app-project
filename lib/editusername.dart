@@ -5,12 +5,12 @@ import 'dart:convert';
 
 class EditAccountScreen extends StatefulWidget {
   final String username;
-  final String user_id;  // เพิ่มพารามิเตอร์ userId
+  final String userId;  // เพิ่มพารามิเตอร์ userId
 
   const EditAccountScreen({
     Key? key, 
     required this.username, 
-    required this.user_id,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -25,7 +25,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
   Future<void> _updateusername() async {
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
-        Uri.parse('http://192.168.211.28/signup/Editusername.php'),
+        Uri.parse('http://192.168.217.28/signup/Editusername.php'),
         body: {
           'id': '1', 
           'new_username': _newusernameController.text,
@@ -96,7 +96,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 61, 167, 249),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 onPressed: _updateusername,

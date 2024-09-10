@@ -4,6 +4,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ChangePasswordPage extends StatefulWidget {
+  final String userId; // เปลี่ยนเป็น userId
+
+  const ChangePasswordPage({Key? key, required this.userId}) : super(key: key);
+
   @override
   _ChangePasswordPageState createState() => _ChangePasswordPageState();
 }
@@ -15,40 +19,52 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _confirmPasswordController = TextEditingController();
 
   Future<void> _updatePassword() async {
-  if (_formKey.currentState!.validate()) {
-    if (_newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('รหัสผ่านไม่ตรงกัน')),
-      );
-      return; // Exit the function if passwords do not match
-    }
-
-    final response = await http.post(
-      Uri.parse('http://192.168.173.28/signup/changepassword.php'),
-      body: {
-        'id': '1',
-        'new_password': _newPasswordController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      if (result['success']) {
+    if (_formKey.currentState!.validate()) {
+      if (_newPasswordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Password updated successfully')),
+          SnackBar(content: Text('รหัสผ่านไม่ตรงกัน')),
         );
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('http://192.168.217.28/signup/changepassword.php'),
+        body: {
+          'user_id': '1',
+          'current_password': _currentPasswordController.text,
+          'new_password': _newPasswordController.text,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        print(result); // Add this to see the response
+        if (result['success']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('เปลี่ยนรหัสผ่านสำเร็จ')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AccountScreen(
+                username: '', // Pass the username if available
+                userId: widget.userId,
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน')),
+          );
+        }
       } else {
+        print('Server error: ${response.statusCode}, ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating password')),
+          SnackBar(content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อ')),
         );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Network error')),
-      );
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -68,18 +84,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'รหัสผ่านปัจจุบัน',
-                  border: OutlineInputBorder(), // Add this line for border
+                  border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2.0), // Customize focused border
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 1.0), // Customize enabled border
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
                   ),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'กรุณากรอกรหัสผ่านปัจจุบัน';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -87,21 +105,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'รหัสผ่านใหม่',
-                  border: OutlineInputBorder(), // Add this line for border
+                  border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2.0), // Customize focused border
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 1.0), // Customize enabled border
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a new password';
+                    return 'กรุณากรอกรหัสผ่านใหม่';
                   }
                   return null;
                 },
@@ -112,45 +126,31 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'ยืนยันรหัสผ่านใหม่',
-                  border: OutlineInputBorder(), // Add this line for border
+                  border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2.0), // Customize focused border
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey,
-                        width: 1.0), // Customize enabled border
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
                   ),
                 ),
-                validator: (val) {
-                        if (val!.isEmpty) {
-                          return 'กรุณากรอกข้อมูล';
-                        } else if (val != _confirmPasswordController.text) {
-                          return 'รหัสไม่ตรงกัน';
-                        }
-                        return null;
-                      },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'กรุณายืนยันรหัสผ่านใหม่';
+                  } else if (value != _newPasswordController.text) {
+                    return 'รหัสผ่านไม่ตรงกัน';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 61, 167, 249),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
+                      borderRadius: BorderRadius.circular(10)),
                 ),
-                onPressed: () {
-                  _updatePassword();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const AccountScreen(
-                              username: '',
-                              user_id: '',
-                            )),
-                  );
-                },
+                onPressed: _updatePassword,
                 child: const Text(
                   'เปลี่ยนรหัสผ่าน',
                   style: TextStyle(
@@ -167,3 +167,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 }
+
+
+

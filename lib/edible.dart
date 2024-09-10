@@ -18,7 +18,7 @@ class _MushroomEdiblePageState extends State<MushroomEdiblePage> {
 
   Future<void> getrecord() async {
     try {
-      var response = await http.get(Uri.parse("http://192.168.173.28/signup/edible_list.php"));
+      var response = await http.get(Uri.parse("http://192.168.217.28/signup/edible_list.php"));
       print('Raw response body: ${response.body}');
       
       if (response.statusCode == 200) {

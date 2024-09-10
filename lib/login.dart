@@ -40,7 +40,7 @@ class _loginState extends State<Login> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Navbar(username: username.text, user_id: '',),
+          builder: (context) => Navbar(username: username.text, userId: '',),
         ),
       );
     } else {

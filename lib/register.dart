@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Navbar.dart';
+import 'package:flutter_application_1/login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Ensure this is the correct import for your home page
@@ -19,7 +20,7 @@ class _RegisterState extends State<Register> {
   TextEditingController password = TextEditingController();
 
   Future register(BuildContext context) async {
-    var url = "http://192.168.173.28/signup/register.php"; //กำหนด Url ของ server
+    var url = "http://192.168.217.28/signup/register.php"; //กำหนด Url ของ server
     var response = await http.post(Uri.parse(url), body: {
       //ใช้ http.post เพื่อส่งข้อมูล
       "username": username.text,
@@ -52,7 +53,7 @@ class _RegisterState extends State<Register> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Navbar(username: '', user_id: '',)), // Navigate to Home page
+        MaterialPageRoute(builder: (context) => const Navbar(username: '', userId: '',)), // Navigate to Home page
       );
     }
   }
@@ -185,12 +186,36 @@ class _RegisterState extends State<Register> {
                         }
                       },
                       child: const Text(
-                        'Sign up',
+                        'ลงทะเบียน',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(textStyle: const TextStyle(fontSize: 15)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
+                    },
+                    child: const Text.rich(
+                      TextSpan(
+                        text: "มีบัญชีอยู่แล้วหรือไม่ ? ",
+                        style: TextStyle(color: Color.fromARGB(255, 107, 184, 236)),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: "เข้าสู่ระบบ",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 61, 167, 249),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

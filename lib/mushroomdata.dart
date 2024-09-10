@@ -21,7 +21,7 @@ class _DataMushroomPageState extends State<DataMushroomPage> {
   }
 
   Future<Map<String, dynamic>> fetchNewsContent(String mushroomData) async {
-    String uri = "http://192.168.211.28/signup/view_mushroom.php?mush_id=$mushroomData";
+    String uri = "http://192.168.217.28/signup/view_mushroom.php?mush_id=$mushroomData";
 
     try {
       var response = await http.get(Uri.parse(uri));

@@ -4,6 +4,7 @@ import 'register.dart';
 import 'accountpage.dart';
 import 'Scan.dart';
 import 'option.dart';
+import 'home.dart';
 
 void main() {
   runApp(const MyApp());

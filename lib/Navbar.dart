@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/home.dart';
-import 'package:flutter_application_1/Scan.dart'; // Ensure the import matches the file and class name
+import 'package:flutter_application_1/Scan.dart';
 import 'package:flutter_application_1/firstaid.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class Navbar extends StatefulWidget {
   final String username;
-  final String user_id;
+  final String userId;
 
-  const Navbar({Key? key, required this.username, required this.user_id}) : super(key: key);
+  const Navbar({Key? key, required this.username, required this.userId}) : super(key: key);
 
   @override
   State<Navbar> createState() => _NavbarState();
@@ -21,10 +21,9 @@ class _NavbarState extends State<Navbar> {
   @override
   void initState() {
     super.initState();
-    // Pass the username to pages that require it
     pages = [
-      Homepage(username: widget.username, user_id: widget.user_id),  // Pass the username here
-      ScanPage(), // Update the class name here
+      Homepage(username: widget.username, userId: widget.userId),
+      ScanPage(),
       FirstaidPage(),
     ];
   }

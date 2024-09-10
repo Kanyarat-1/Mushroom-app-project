@@ -5,6 +5,8 @@ import 'package:tflite_flutter/tflite_flutter.dart' as tfl;
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ScanPage extends StatefulWidget {
   @override
@@ -22,14 +24,22 @@ class _ScanPageState extends State<ScanPage> {
   @override
   void initState() {
     super.initState();
+    _requestPermissions();
     _loadModel();
     _loadLabels();
     _resetImages();
   }
 
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.camera,
+      Permission.photos,
+    ].request();
+  }
+
   Future<void> _loadModel() async {
     try {
-      _interpreter = await tfl.Interpreter.fromAsset('assets/model-mushroom-corrected.tflite');
+      _interpreter = await tfl.Interpreter.fromAsset('assets/model_unquant.tflite');
       print('Model loaded successfully');
     } catch (e) {
       print('Failed to load model: $e');
@@ -44,21 +54,33 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> _pickImage({ImageSource source = ImageSource.camera}) async {
-    final pickedFile = await _picker.pickImage(source: source);
+  final pickedFile = await _picker.pickImage(source: source);
 
-    if (pickedFile != null) {
-      setState(() {
-        if (_imageCounter == 0) {
-          _sideImage = File(pickedFile.path);
-        } else if (_imageCounter == 1) {
-          _topImage = File(pickedFile.path);
-        } else if (_imageCounter == 2) {
-          _bottomImage = File(pickedFile.path);
-        }
-        _imageCounter++;
-      });
+  if (pickedFile != null) {
+    setState(() {
+      if (_imageCounter == 0) {
+        _sideImage = File(pickedFile.path);
+      } else if (_imageCounter == 1) {
+        _topImage = File(pickedFile.path);
+      } else if (_imageCounter == 2) {
+        _bottomImage = File(pickedFile.path);
+      }
+      _imageCounter++;
+    });
+
+    try {
+      // บันทึกรูปเข้าแกลลอรี่
+      final result = await GallerySaver.saveImage(pickedFile.path);
+      if (result != null && result) {
+        print('Image saved to gallery');
+      } else {
+        print('Failed to save image to gallery');
+      }
+    } catch (e) {
+      print('Error saving image: $e');
     }
   }
+}
 
   Future<void> _processImages() async {
     if (_sideImage != null && _topImage != null && _bottomImage != null) {
@@ -101,8 +123,8 @@ class _ScanPageState extends State<ScanPage> {
 
       _showResultsDialog();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please take all 3 photos'),
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('กรุณาถ่ายให้ครบ 3 ภาพ'),
       ));
     }
   }
@@ -132,12 +154,12 @@ class _ScanPageState extends State<ScanPage> {
     for (int i = 0; i < outputShape[1]; i++) {
       results.add({
         'confidence': output[0][i],
-        'label': _labels![i],
+        'label': _labels![i],   
       });
     }
 
     results.sort((a, b) => b['confidence'].compareTo(a['confidence']));
-    return results.take(3).toList();
+    return results.take(3).toList(); // แสดงผลลัพธ์ 3 อันดับแรกตามค่า confidence
   }
 
   void _showResultsDialog() {
@@ -151,7 +173,7 @@ class _ScanPageState extends State<ScanPage> {
                 right: 0,
                 top: 0,
                 child: IconButton(
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   onPressed: () {
                     Navigator.of(context, rootNavigator: true).pop();
                   },
@@ -187,7 +209,10 @@ class _ScanPageState extends State<ScanPage> {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pushNamed('/mushroomAttributesPage');
+                 Navigator.of(context).pushNamed('/mushroomAttributesPage', arguments: {
+                'mushroomName': _topPredictions.first['label'],
+                'percentPredic': _topPredictions.first['confidence'] * 100,
+              });
               },
             ),
           ],
@@ -197,85 +222,93 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _resetImages();
-        return true;
-      },
-      child: Scaffold(
+Widget build(BuildContext context) {
+  // ignore: deprecated_member_use
+  return WillPopScope(
+    onWillPop: () async {
+      _resetImages();
+      return true;  // allows pop
+    },
+    child: Scaffold(
         appBar: AppBar(
           title: Text("Scan Page"),
           automaticallyImplyLeading: false,
-        ),
-        body: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildImagePreview('Side', _sideImage),
-                    _buildImagePreview('Top', _topImage),
-                    _buildImagePreview('Bottom', _bottomImage),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'กรุณาถ่ายให้ครบ 3 ภาพ แล้วกด ตกลง',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 20,
-              left: MediaQuery.of(context).size.width * 0.5 - 25,
-              child: GestureDetector(
-                onTap: _imageCounter < 3 ? () => _pickImage() : null,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 99, 183, 228),
-                        Color.fromARGB(255, 106, 157, 234),
-                      ],
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: _imageCounter < 3 ? Colors.white : Colors.grey,
-                    size: 30,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 16,
-              right: 16,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: _processImages,
-                    child: const Text(
-                      'ตกลง',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: _resetImages,
             ),
           ],
         ),
+      body: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildImagePreview('Side', _sideImage),
+                  _buildImagePreview('Top', _topImage),
+                  _buildImagePreview('Bottom', _bottomImage),
+                ],
+              ),
+              SizedBox(height: 20),
+              Text(
+                'กรุณาถ่ายให้ครบ 3 ภาพ แล้วกด ตกลง',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 20,
+            left: MediaQuery.of(context).size.width * 0.5 - 25,
+            child: GestureDetector(
+              onTap: _imageCounter < 3 ? () => _pickImage() : null,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 99, 183, 228),
+                      Color.fromARGB(255, 106, 157, 234),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: Icon(
+                  Icons.camera_alt,
+                  color: _imageCounter < 3 ? Colors.white : Colors.grey,
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            left: 16,
+            right: 16,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: _processImages,
+                  child: const Text(
+                    'ตกลง',
+                    style: TextStyle(
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _resetImages() {
     setState(() {
@@ -283,6 +316,7 @@ class _ScanPageState extends State<ScanPage> {
       _topImage = null;
       _bottomImage = null;
       _imageCounter = 0;
+      _topPredictions.clear();
     });
   }
 
@@ -291,11 +325,11 @@ class _ScanPageState extends State<ScanPage> {
       onTap: () {},
       child: Container(
         margin: EdgeInsets.all(8),
-        height: 150,
+        height: 160,
         width: 100,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: imageFile != null
             ? Image.file(imageFile, fit: BoxFit.cover)

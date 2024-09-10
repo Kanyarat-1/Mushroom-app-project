@@ -3,6 +3,8 @@ import 'package:flutter_application_1/Navbar.dart';
 import 'package:ionicons/ionicons.dart';
 
 class FirstaidPage extends StatelessWidget {
+  const FirstaidPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Get the screen width
@@ -10,7 +12,7 @@ class FirstaidPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "การปฐมพยาบาล",
           style: TextStyle(
             fontSize: 24,
@@ -22,7 +24,7 @@ class FirstaidPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const Navbar(username: '', user_id: '',),
+                builder: (context) => const Navbar(username: '', userId: '',),
               ),
             );
           },
@@ -32,14 +34,7 @@ class FirstaidPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.asset("lib/assets/firstaid1.jpg", width: 400, height: 200),
-            const SizedBox(height: 20),
-            Image.asset("lib/assets/firstaid2.jpg", width: 800, height: 200),
-            const SizedBox(height: 20),
-            Image.asset("lib/assets/firstaid3.jpg", width: 800, height: 200),
-            const SizedBox(height: 20),
-            Image.asset("lib/assets/firstaid4.jpg", width: 400, height: 200),
-            const SizedBox(height: 20),
+            Image.asset("lib/assets/First1.png"),
           ],
         ),
       ),
