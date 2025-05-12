@@ -10,6 +10,7 @@ A system for searching for mushroom names by taking photos
 
 ![ดีไซน์ที่ยังไม่ได้ตั้งชื่อ (14)](https://github.com/user-attachments/assets/ad3f8838-1512-41bc-817a-aadf4322fab7)
 
-![scanpage2](https://github.com/user-attachments/assets/e9acec66-444e-4f9f-913d-d5ac1813fd41)
+![scanpage3](https://github.com/user-attachments/assets/2caf05cd-36fa-4bcb-a1fa-83f9f5c7a8d0)
 
 ![resultpage1](https://github.com/user-attachments/assets/07bd3d0d-5808-4f59-9258-32c93baced56)
+
