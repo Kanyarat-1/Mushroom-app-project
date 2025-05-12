@@ -1,16 +1,12 @@
-# flutter_application_1
+# Mushroom app Project
 
-A new Flutter project.
+A system for searching for mushroom names by taking photos
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![homepage](https://github.com/user-attachments/assets/2cac1dfc-e0b8-4d37-a9f4-8c30e6e0466d)
+![edible-page](https://github.com/user-attachments/assets/2822f91c-91e2-42d9-b189-3f9a144b92fb)
+![ดีไซน์ที่ยังไม่ได้ตั้งชื่อ (14)](https://github.com/user-attachments/assets/ad3f8838-1512-41bc-817a-aadf4322fab7)
+![scanpage2](https://github.com/user-attachments/assets/e9acec66-444e-4f9f-913d-d5ac1813fd41)
+![resultpage1](https://github.com/user-attachments/assets/07bd3d0d-5808-4f59-9258-32c93baced56)
